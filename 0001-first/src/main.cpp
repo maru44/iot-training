@@ -1,14 +1,16 @@
 #include <Arduino.h>
-#include <cstdlib>
-#include <iostream>
+// #include <cstdlib>
+// #include <iostream>
 
 void setup()
 {
-  // put your setup code here, to run once:
-  std::cout << std::getenv("TEST_STRING") << std::endl;
+  pinMode(2, OUTPUT);
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
+  digitalWrite(2, HIGH);
+  delay(1000);
+  digitalWrite(2, LOW);
+  delay(1000);
 }

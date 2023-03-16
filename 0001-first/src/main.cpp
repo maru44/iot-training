@@ -5,6 +5,7 @@
 void setup()
 {
   // put your setup code here, to run once:
+  std::cout << std::getenv("TEST_STRING") << std::endl;
 }
 
 void loop()

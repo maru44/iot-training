@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <cstdlib>
 #include <iostream>
-#include <string>
+// #include <string>
 
 #define LED_PIN 2
 
@@ -23,8 +23,8 @@ void loop()
   digitalWrite(LED_PIN, HIGH);
   Serial.printf("%s - LED_PIN - HIGH\n", __func__);
 
-#ifdef TEST_STRING
-  Serial.printf("%s\n", TEST_STRING);
+#ifdef ENV_TEST_STRING
+  Serial.printf("%s\n", ENV_TEST_STRING);
 #endif
 
   delay(1000);

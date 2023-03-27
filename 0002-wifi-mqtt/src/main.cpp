@@ -15,6 +15,40 @@ const int MQTT_TIMEOUT_MS = 5000;
 WiFiClientSecure net = WiFiClientSecure();
 MQTTClient client = MQTTClient(256);
 
+inline const char *ToString(esp_sleep_wakeup_cause_t v)
+{
+  switch (v)
+  {
+  case ESP_SLEEP_WAKEUP_UNDEFINED:
+    return "ESP_SLEEP_WAKEUP_UNDEFINED";
+  case ESP_SLEEP_WAKEUP_EXT0:
+    return "ESP_SLEEP_WAKEUP_EXT0";
+  case ESP_SLEEP_WAKEUP_EXT1:
+    return "ESP_SLEEP_WAKEUP_EXT1";
+  case ESP_SLEEP_WAKEUP_TIMER:
+    return "ESP_SLEEP_WAKEUP_TIMER";
+  case ESP_SLEEP_WAKEUP_TOUCHPAD:
+    return "ESP_SLEEP_WAKEUP_TOUCHPAD";
+  case ESP_SLEEP_WAKEUP_ULP:
+    return "ESP_SLEEP_WAKEUP_ULP";
+  case ESP_SLEEP_WAKEUP_GPIO:
+    return "ESP_SLEEP_WAKEUP_GPIO";
+  case ESP_SLEEP_WAKEUP_UART:
+    return "ESP_SLEEP_WAKEUP_UART";
+  case ESP_SLEEP_WAKEUP_COCPU:
+    return "ESP_SLEEP_WAKEUP_COCPU";
+  case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG:
+    return "ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
+  case ESP_SLEEP_WAKEUP_BT:
+    return "ESP_SLEEP_WAKEUP_BT";
+  default:
+    /* must not reach here */
+    // sprintf(ret, "ESP_SLEEP_UNKNOWN:%d", v);
+    // return ret;
+    return "ESP_SlEEP_UNKNOWN:" + v;
+  }
+}
+
 void delay_with_client_loop(unsigned long ms)
 {
   unsigned long start = millis();
@@ -118,6 +152,7 @@ void publishMessage()
 void notifySetup()
 {
   esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+  Serial.printf("wake up: %s\n", ToString(cause)); // TODO delete
   switch (cause)
   {
   case ESP_SLEEP_WAKEUP_TIMER:
@@ -126,8 +161,8 @@ void notifySetup()
 
   default:
     // Serial.printf('wake up: %d\n', cause); // TODO delete
-    Serial.printf("wu: %d\n", cause);
-    // TODO: send topic to notify start
+    Serial.printf("wake up: %s\n", ToString(cause));
+    // TODO: send message to the topic
     break;
   }
 }

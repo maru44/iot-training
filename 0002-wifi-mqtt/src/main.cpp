@@ -3,6 +3,9 @@
 #include <MQTTClient.h>
 #include <ArduinoJson.h>
 #include "Secrets.h"
+#include <cstdlib>
+
+#define SLEEP_TIME 60 * 1000000ul // sleep time (1min)
 
 const char *AWS_IOT_PUBLISH_TOPIC = "test0001/topic0001";
 
@@ -112,6 +115,23 @@ void publishMessage()
   }
 }
 
+void notifySetup()
+{
+  esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+  switch (cause)
+  {
+  case ESP_SLEEP_WAKEUP_TIMER:
+    Serial.println("skip: wake up by timer"); // TODO delete
+    break;
+
+  default:
+    // Serial.printf('wake up: %d\n', cause); // TODO delete
+    Serial.printf("wu: %d\n", cause);
+    // TODO: send topic to notify start
+    break;
+  }
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -119,6 +139,8 @@ void setup()
 
   WiFi.mode(WIFI_STA);
   WiFi.setAutoConnect(false);
+
+  notifySetup();
 }
 
 void loop()
@@ -127,6 +149,9 @@ void loop()
   connectAWS();
   publishMessage();
 
-  delay_with_client_loop(60 * 1000);
+  // delay_with_client_loop(60 * 1000);
   // delay(60000);
+
+  delay(100);
+  esp_deep_sleep(SLEEP_TIME);
 }

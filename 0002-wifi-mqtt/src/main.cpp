@@ -6,8 +6,10 @@
 #include <cstdlib>
 
 #define SLEEP_TIME 60 * 1000000ul // sleep time (1min)
+RTC_DATA_ATTR int bootCount = 0;
 
 const char *AWS_IOT_PUBLISH_TOPIC = "test0001/topic0001";
+const char *AWS_IOT_PUBLISH_TOPIC_FOR_SETUP = "topic0002/setup";
 
 const int WIFI_TIMEOUT_MS = 20000;
 const int MQTT_TIMEOUT_MS = 5000;
@@ -15,7 +17,7 @@ const int MQTT_TIMEOUT_MS = 5000;
 WiFiClientSecure net = WiFiClientSecure();
 MQTTClient client = MQTTClient(256);
 
-inline const char *ToString(esp_sleep_wakeup_cause_t v)
+inline const char *toString(esp_sleep_wakeup_cause_t v)
 {
   switch (v)
   {
@@ -46,15 +48,6 @@ inline const char *ToString(esp_sleep_wakeup_cause_t v)
     // sprintf(ret, "ESP_SLEEP_UNKNOWN:%d", v);
     // return ret;
     return "ESP_SlEEP_UNKNOWN:" + v;
-  }
-}
-
-void delay_with_client_loop(unsigned long ms)
-{
-  unsigned long start = millis();
-  while ((millis() - start) < ms)
-  {
-    client.loop();
   }
 }
 
@@ -149,10 +142,29 @@ void publishMessage()
   }
 }
 
+void publishSetup(esp_sleep_wakeup_cause_t v)
+{
+  StaticJsonDocument<200> doc;
+  doc["reason"] = toString(v);
+
+  char jsonBuffer[512];
+  serializeJson(doc, jsonBuffer);
+
+  bool published = client.publish(AWS_IOT_PUBLISH_TOPIC_FOR_SETUP, jsonBuffer);
+  if (published)
+  {
+    Serial.println("Publish setup Success");
+  }
+  else
+  {
+    Serial.println("Publish setup fail");
+  }
+}
+
 void notifySetup()
 {
   esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
-  Serial.printf("wake up: %s\n", ToString(cause)); // TODO delete
+  Serial.printf("wake up: %s\n", toString(cause)); // TODO delete
   switch (cause)
   {
   case ESP_SLEEP_WAKEUP_TIMER:
@@ -161,8 +173,10 @@ void notifySetup()
 
   default:
     // Serial.printf('wake up: %d\n', cause); // TODO delete
-    Serial.printf("wake up: %s\n", ToString(cause));
-    // TODO: send message to the topic
+    Serial.printf("wake up: %s\n", toString(cause));
+    connectWiFi();
+    connectAWS();
+    publishSetup(cause);
     break;
   }
 }
@@ -176,17 +190,20 @@ void setup()
   WiFi.setAutoConnect(false);
 
   notifySetup();
+  Serial.println("setupped");
 }
 
 void loop()
 {
-  connectWiFi();
-  connectAWS();
-  publishMessage();
+  bootCount++;
+  // 初回起動時は飛ばす
+  if (bootCount > 1)
+  {
+    connectWiFi();
+    connectAWS();
+    publishMessage();
+  }
 
-  // delay_with_client_loop(60 * 1000);
-  // delay(60000);
-
-  delay(100);
+  delay(50);
   esp_deep_sleep(SLEEP_TIME);
 }

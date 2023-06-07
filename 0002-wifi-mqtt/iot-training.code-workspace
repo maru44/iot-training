@@ -1,0 +1,16 @@
+{
+  "folders": [
+	{
+		"path": ".."
+	},
+	{
+		"name": "0001-first",
+		"path": "../0001-first"
+	},
+	{
+		"name": "0002-wifi-mqtt",
+		"path": "."
+	}
+],
+  "settings": {}
+}

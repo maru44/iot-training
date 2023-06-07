@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include "Secrets.h"
 #include <cstdlib>
+#include "esp_wifi.h"
 
 #define SLEEP_TIME 60 * 1000000ul // sleep time (1min)
 RTC_DATA_ATTR int bootCount = 0;
@@ -16,6 +17,13 @@ const int MQTT_TIMEOUT_MS = 5000;
 
 WiFiClientSecure net = WiFiClientSecure();
 MQTTClient client = MQTTClient(256);
+
+static void wifi_disconnect()
+{
+  ESP_LOGI(TAG, "Disconnect WiFi.");
+  ESP_ERROR_CHECK(esp_wifi_disconnect());
+  ESP_ERROR_CHECK(esp_wifi_stop());
+}
 
 inline const char *toString(esp_sleep_wakeup_cause_t v)
 {
@@ -165,20 +173,24 @@ void notifySetup()
 {
   esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
   Serial.printf("wake up: %s\n", toString(cause)); // TODO delete
-  switch (cause)
-  {
-  case ESP_SLEEP_WAKEUP_TIMER:
-    Serial.println("skip: wake up by timer"); // TODO delete
-    break;
 
-  default:
-    // Serial.printf('wake up: %d\n', cause); // TODO delete
-    Serial.printf("wake up: %s\n", toString(cause));
-    connectWiFi();
-    connectAWS();
-    publishSetup(cause);
-    break;
-  }
+  //   switch (cause)
+  //   {
+  //   case ESP_SLEEP_WAKEUP_TIMER:
+  //     Serial.println("skip: wake up by timer"); // TODO delete
+  //     break;
+  //   default:
+  //     // Serial.printf('wake up: %d\n', cause); // TODO delete
+  //     Serial.printf("wake up: %s\n", toString(cause));
+  //     connectWiFi();
+  //     connectAWS();
+  //     publishSetup(cause);
+  //     break;
+  //   }
+
+  connectWiFi();
+  connectAWS();
+  publishSetup(cause);
 }
 
 void setup()
@@ -190,7 +202,7 @@ void setup()
   WiFi.setAutoConnect(false);
 
   notifySetup();
-  Serial.println("setupped");
+  wifi_disconnect();
 }
 
 void loop()
@@ -205,5 +217,6 @@ void loop()
   }
 
   delay(50);
+  wifi_disconnect();
   esp_deep_sleep(SLEEP_TIME);
 }

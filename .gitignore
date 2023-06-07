@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# MINE
+# secret header
+**/src/**/Secrets.h

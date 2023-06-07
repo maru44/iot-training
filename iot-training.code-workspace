@@ -6,7 +6,15 @@
 		{
 			"name": "0001-first",
 			"path": "0001-first"
-		}
+		},
+		{
+			"name": "0002-wifi",
+			"path": "0002-wifi"
+		},
+		{
+			"name": "0003-measuring-volt",
+			"path": "0003-measuring-volt"
+		},
 	],
 	"settings": {}
 }

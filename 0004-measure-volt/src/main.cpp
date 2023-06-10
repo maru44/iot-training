@@ -12,8 +12,9 @@ RTC_DATA_ATTR int bootCount = 0;
 
 const char *AWS_IOT_PUBLISH_TOPIC = "test0001/topic0001";
 
-const int WIFI_TIMEOUT_MS = 20000;
-const int MQTT_TIMEOUT_MS = 5000;
+// TODO modify
+const int WIFI_TIMEOUT_MS = 2000;
+const int MQTT_TIMEOUT_MS = 2000;
 
 WiFiClientSecure net = WiFiClientSecure();
 MQTTClient client = MQTTClient(256);
@@ -115,20 +116,21 @@ void connectAWS()
     delay(100);
     client_connecting += 100;
   }
+
   if (!client.connected())
   {
     WiFi.disconnect(true, true);
 
     Serial.println("AWS IoT Timeout!");
 
-    delay(300000);
-    ESP.restart();
+    // delay(300000);
+    // ESP.restart();
+    delay(50);
+    esp_deep_sleep(SLEEP_TIME);
     return;
   }
 
   Serial.println("AWS IoT Connected!");
-
-  return;
 }
 
 void publishMessage()
@@ -139,8 +141,7 @@ void publishMessage()
   StaticJsonDocument<200> doc;
   doc["device_id"] = DEVICE_ID;
   doc["kind"] = "measure-voltage";
-  // three times
-  doc["milli_voltage"] = milliVoltage * 3;
+  doc["milli_voltage"] = milliVoltage * 3; // three times
 
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer); // print to client
@@ -156,10 +157,9 @@ void publishMessage()
   }
 }
 
-void publishSetup(esp_sleep_wakeup_cause_t v)
+void publishSetup()
 {
   StaticJsonDocument<200> doc;
-  doc["reason"] = toString(v);
   doc["device_id"] = DEVICE_ID;
   doc["kind"] = "setup";
 
@@ -177,30 +177,6 @@ void publishSetup(esp_sleep_wakeup_cause_t v)
   }
 }
 
-void notifySetup()
-{
-  esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
-  Serial.printf("wake up: %s\n", toString(cause)); // TODO delete
-
-  //   switch (cause)
-  //   {
-  //   case ESP_SLEEP_WAKEUP_TIMER:
-  //     Serial.println("skip: wake up by timer"); // TODO delete
-  //     break;
-  //   default:
-  //     // Serial.printf('wake up: %d\n', cause); // TODO delete
-  //     Serial.printf("wake up: %s\n", toString(cause));
-  //     connectWiFi();
-  //     connectAWS();
-  //     publishSetup(cause);
-  //     break;
-  //   }
-
-  connectWiFi();
-  connectAWS();
-  publishSetup(cause);
-}
-
 void setup()
 {
   Serial.begin(115200);
@@ -210,14 +186,20 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.setAutoConnect(false);
 
-  if (bootCount == 0)
+  esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+  Serial.printf("wake up: %s\n", toString(cause)); // TODO delete
+
+  switch (cause)
   {
-    notifySetup();
-    bootCount++;
+  case ESP_SLEEP_WAKEUP_UNDEFINED:
+    connectWiFi();
+    connectAWS();
+    publishSetup();
     // wifi_disconnect();
 
     delay(50);
     esp_deep_sleep(SLEEP_TIME);
+    break;
   }
 }
 

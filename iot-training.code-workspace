@@ -15,6 +15,10 @@
 			"name": "0003-measuring-volt",
 			"path": "0003-measuring-volt"
 		},
+		{
+			"name": "0004-measure-volt",
+			"path": "0004-measure-volt"
+		},
 	],
 	"settings": {}
 }

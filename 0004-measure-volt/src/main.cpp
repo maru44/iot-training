@@ -137,7 +137,7 @@ void publishMessage()
   Serial.printf("%d[mV]\n", milliVoltage);
 
   StaticJsonDocument<200> doc;
-  doc["device_id"] = "TEST_DEVICE_0001"; // TODO use env
+  doc["device_id"] = DEVICE_ID;
   doc["kind"] = "measure-voltage";
   // three times
   doc["milli_voltage"] = milliVoltage * 3;
@@ -160,6 +160,8 @@ void publishSetup(esp_sleep_wakeup_cause_t v)
 {
   StaticJsonDocument<200> doc;
   doc["reason"] = toString(v);
+  doc["device_id"] = DEVICE_ID;
+  doc["kind"] = "setup";
 
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);

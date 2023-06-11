@@ -8,6 +8,7 @@
 
 #define VOLT_PIN 32
 #define SLEEP_TIME 600 * 1000000ul // sleep time (10min)
+const int VOLTAGE_DIVISIONAL_COUNT = 3;
 RTC_DATA_ATTR int bootCount = 0;
 
 const char *AWS_IOT_PUBLISH_TOPIC = "test0001/topic0001";
@@ -136,12 +137,14 @@ void connectAWS()
 void publishMessage()
 {
   int milliVoltage = analogReadMilliVolts(VOLT_PIN);
-  Serial.printf("%d[mV]\n", milliVoltage);
 
   StaticJsonDocument<200> doc;
   doc["device_id"] = DEVICE_ID;
   doc["kind"] = "measure-voltage";
-  doc["milli_voltage"] = milliVoltage * 3; // three times
+  // voltage is divided
+  // times 3.3 / (divisional count * 4096) in lambda function
+  int voltage = (int)(milliVoltage * 3.3 * VOLTAGE_DIVISIONAL_COUNT * 1000 / 4096);
+  doc["milli_voltage"] = voltage;
 
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer); // print to client

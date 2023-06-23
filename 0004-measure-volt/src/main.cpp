@@ -20,13 +20,6 @@ const int MQTT_TIMEOUT_MS = 2000;
 WiFiClientSecure net = WiFiClientSecure();
 MQTTClient client = MQTTClient(256);
 
-// static void wifi_disconnect()
-// {
-//   ESP_LOGI(TAG, "Disconnect WiFi.");
-//   ESP_ERROR_CHECK(esp_wifi_disconnect());
-//   ESP_ERROR_CHECK(esp_wifi_stop());
-// }
-
 inline const char *toString(esp_sleep_wakeup_cause_t v)
 {
   switch (v)

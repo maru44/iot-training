@@ -19,6 +19,10 @@
 			"name": "0004-measure-volt",
 			"path": "0004-measure-volt"
 		},
+		{
+			"name": "0006-hall-wakeup",
+			"path": "0006-hall-wakeup"
+		},
 	],
 	"settings": {}
 }

@@ -42,7 +42,6 @@ inline const char *toString(esp_sleep_wakeup_cause_t v)
 void setup()
 {
   Serial.begin(115200);
-  // pinMode(HALL_PIN, INPUT_PULLDOWN);
   pinMode(HALL_PIN, INPUT);
 
   if (bootCount == 0)

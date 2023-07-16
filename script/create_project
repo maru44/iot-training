@@ -1,6 +1,11 @@
 #!/bin/bash
 
 main() {
+    if [ -z $1 ]; then
+        echo "Error: project name is empty"
+        return
+    fi
+
     local readonly index=$(cat ./projects.json | jq .index)
     local readonly new_project="$(printf "%04d_%s" $(($index + 1)) $1)"
 

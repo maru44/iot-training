@@ -35,3 +35,4 @@
 # secret header
 **/src/**/Secrets.h
 .DS_Store
+**/.vscode/**

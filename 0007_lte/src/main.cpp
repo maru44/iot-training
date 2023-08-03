@@ -1,20 +1,23 @@
 #define TINY_GSM_MODEM_SIM7080
 // #define TINY_GSM_DEBUG Serial
 #define SerialMon Serial
-#define SerialAT Serial1
+#define SerialAT Serial2
 
 #include <TinyGsmClient.h>
 #include <ArduinoHttpClient.h>
 #include <ArduinoJson.h>
 
-//--- TODO: 使用するSIMのAPN情報に書き換えてください。
-const char apn[] = "soracom.io"; // "h.iijmobile.biz";
+#define GSM_AUTOBAUD_MIN 9600
+#define GSM_AUTOBAUD_MAX 115200
+
+const char apn[] = "soracom.io";
 const char lte_user[] = "sora";
 const char lte_pass[] = "sora";
 //---
 
-const int rx_pin = 26;
-const int tx_pin = 27;
+const int PIN_TX = 17;
+const int PIN_RX = 16;
+const int PIN_POWER = 4;
 
 const int sleep_sec = 60;
 
@@ -26,6 +29,10 @@ const int port = 443;
 TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
 
+// #define AC_UART_INSTANCE 2
+// #define AC_TX_PIN GPIO_NUM_4;
+// #define AC_RX_PIN GPIO_NUM_0;
+
 /*
   setup関数
 */
@@ -33,16 +40,45 @@ void setup()
 {
     delay(500);
     SerialMon.begin(115200);
+    while (!SerialMon)
+        ;
+    SerialMon.println("start");
+
+    // pinMode(PIN_TX, OUTPUT);
+    // pinMode(PIN_RX, INPUT);
+
+    delay(5000);
+
+    pinMode(4, OUTPUT);
+    // digitalWrite(4, LOW);
+    // delay(500);
+    // digitalWrite(4, HIGH);
+    // delay(500);
+    // digitalWrite(4, LOW);
+    // delay(500);
+    digitalWrite(4, HIGH);
+    delay(500);
+
+    SerialMon.println("start2");
+
+    SerialAT.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+    while (!SerialAT)
+        ;
+
+    SerialMon.printf("available: %d", SerialAT.available());
 
     delay(3000);
 
-    pinMode(25, OUTPUT);
-    digitalWrite(25, HIGH);
-    delay(500);
-    // digitalWrite(25, LOW);
+    pinMode(4, OUTPUT);
+    // digitalWrite(4, LOW);
     // delay(500);
+    // digitalWrite(4, HIGH);
+    // delay(500);
+    // digitalWrite(4, LOW);
+    // delay(500);
+    digitalWrite(4, HIGH);
+    delay(500);
 
-    SerialAT.begin(115200, SERIAL_8N1, rx_pin, tx_pin);
     delay(3000);
 
     SerialMon.println("Wait...");
@@ -50,7 +86,6 @@ void setup()
     SerialMon.println("Initializing modem...");
 
     bool initOK = modem.init();
-    // bool initOK = modem.testAT();
 
     SerialMon.printf("init: %d\n", initOK);
     String modemInfo = modem.getModemInfo();
@@ -92,18 +127,8 @@ void setup()
     randomSeed(analogRead(25));
 }
 
-/*
-  IIJ IoTサービスにデータ送信する
-    引数
-      const char* ns     : 送信する namespace値
-      const char* name   : 送信する name値
-      const double value : 送信する value値
-    戻り値
-      bool true:送信成功 false:送信失敗
-*/
 bool send_data()
 {
-    // JSON文字列をIIJ IoTサービスにPOST
     HttpClient http(client, server, port);
     http.beginRequest();
     http.get(resource);

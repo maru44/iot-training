@@ -15,7 +15,7 @@ main() {
     cd ..
 
     # update projects.json
-    echo "$(cat ./projects.json | jq --arg index $(($index + 1)) '.index |= $index')" > projects.json | jq
+    echo "$(cat ./projects.json | jq --arg index $(($index + 1)) '.index |= ($index|tonumber)')" > projects.json | jq
     # update iot-training.code-workspace
     local readonly workspace_json="$(cat ./iot-training.code-workspace | jq --arg project $new_project '.folders += [ {name: $project, path: $project} ]')"
     echo $workspace_json > ./iot-training.code-workspace | jq

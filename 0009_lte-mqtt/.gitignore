@@ -1,0 +1,3 @@
+.pio
+src/certs/**
+!src/certs/.gitkeep

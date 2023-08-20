@@ -11,7 +11,7 @@ main() {
 
     mkdir $new_project
     cd $new_project
-    pio project init --board upesy_wrover --project-option="monitor_speed=115200"
+    pio project init --board upesy_wroom --project-option="monitor_speed=115200"
     cd ..
 
     # update projects.json

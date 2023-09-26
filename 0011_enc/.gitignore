@@ -1,2 +1,9 @@
 .pio
 __encrypt_key__/*.bin
+__keys__/*
+!__keys__/.gitkeep
+!__keys__/boot
+__keys__/boot/*
+!__keys__/boot/.gitkeep
+__keys__/flash/*
+!__keys__/flash/.gitkeep

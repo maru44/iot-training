@@ -5,5 +5,6 @@ __keys__/*
 !__keys__/boot
 __keys__/boot/*
 !__keys__/boot/.gitkeep
+!__keys__/flash
 __keys__/flash/*
 !__keys__/flash/.gitkeep

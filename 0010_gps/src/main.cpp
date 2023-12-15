@@ -26,8 +26,8 @@ void startSleep()
     Serial.println("sleep");
 #endif
     delay(10);
-    digitalWrite(SIM_PWR_PIN, LOW);
     digitalWrite(SIM_KEY_PIN, LOW);
+    digitalWrite(SIM_PWR_PIN, LOW);
     esp_sleep_enable_timer_wakeup(SLEEP_TIME);
     delay(50);
     esp_deep_sleep_start();
